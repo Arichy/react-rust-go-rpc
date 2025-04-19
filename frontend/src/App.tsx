@@ -2,18 +2,22 @@ import { useState } from 'react';
 import './App.css';
 import PersonList from './components/PersonList';
 import PersonForm from './components/PersonForm';
-import { Person } from './gen/person_pb';
+import { Person, PersonService } from './gen/person_pb';
 import { personClient } from './proxy';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@connectrpc/connect-query';
 
 function App() {
-  const { data: peopleData } = useQuery({
-    queryKey: ['people'],
-    queryFn: async () => {
-      const response = await personClient.listPeople({ pageSize: 100, pageToken: 1 });
-      return response.people;
-    },
-  });
+  // const { data: peopleData } = useQuery({
+  //   queryKey: ['people'],
+  //   queryFn: async () => {
+  //     const response = await personClient.listPeople({ pageSize: 100, pageToken: 1 });
+  //     return response.people;
+  //   },
+  // });
+
+  const { data } = useQuery(PersonService.method.listPeople, { pageSize: 100, pageToken: 1 });
+  const people = data?.people || [];
 
   const queryClient = useQueryClient();
 
@@ -66,11 +70,7 @@ function App() {
           />
         </div>
         <div className="person-list">
-          <PersonList
-            people={peopleData || []}
-            onSelectPerson={setSelectedPerson}
-            onDeletePerson={handleDeletePerson}
-          />
+          <PersonList people={people} onSelectPerson={setSelectedPerson} onDeletePerson={handleDeletePerson} />
         </div>
       </div>
     </div>

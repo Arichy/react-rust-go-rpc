@@ -16,7 +16,7 @@ if ('window' in globalThis && '__CONNECT_WEB_DEVTOOLS__' in globalThis.window) {
 }
 
 // // Now we can use the interceptors in our transport
-const transport: Transport = createGrpcWebTransport({
+export const transport: Transport = createGrpcWebTransport({
   baseUrl: apiUrl,
   interceptors,
 });

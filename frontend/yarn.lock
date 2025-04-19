@@ -123,6 +123,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@connectrpc/connect-query-core@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@connectrpc/connect-query-core@npm:2.0.1"
+  peerDependencies:
+    "@bufbuild/protobuf": 2.x
+    "@connectrpc/connect": ^2.0.0
+    "@tanstack/query-core": 5.x
+  checksum: 10c0/07f8e1142d031a9ad8e59e581bbc2ad0dfbad220228fa47a4aea6ec2199607499cf3663ef6ae4735573c44d64651da2e41fe0eaada4662e9706bfeffa5477a14
+  languageName: node
+  linkType: hard
+
+"@connectrpc/connect-query@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@connectrpc/connect-query@npm:2.0.1"
+  dependencies:
+    "@connectrpc/connect-query-core": "npm:^2.0.1"
+  peerDependencies:
+    "@bufbuild/protobuf": 2.x
+    "@connectrpc/connect": ^2.0.0
+    "@tanstack/react-query": 5.x
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  checksum: 10c0/18d0d3a14b5dcbc283b5ab45b9c4ba291eff2493ce33f93bcb4da09f7ede250860369c5667756d367b7bbcc659462e448d1c791dccaad95d815452b5b28d8c49
+  languageName: node
+  linkType: hard
+
 "@connectrpc/connect-web@npm:^2.0.2":
   version: 2.0.2
   resolution: "@connectrpc/connect-web@npm:2.0.2"
@@ -1621,6 +1647,7 @@ __metadata:
     "@bufbuild/protobuf": "npm:^2.2.5"
     "@bufbuild/protoc-gen-es": "npm:^2.2.5"
     "@connectrpc/connect": "npm:^2.0.2"
+    "@connectrpc/connect-query": "npm:^2.0.1"
     "@connectrpc/connect-web": "npm:^2.0.2"
     "@tanstack/react-query": "npm:^5.74.4"
     "@types/node": "npm:^22.14.1"
