@@ -1,32 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './App.css';
 import PersonList from './components/PersonList';
 import PersonForm from './components/PersonForm';
-import { Person, } from './gen/person_pb';
+import { Person } from './gen/person_pb';
 import { personClient } from './proxy';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 function App() {
-  const [people, setPeople] = useState<Person[]>([]);
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-
-  const fetchPeople = async () => {
-    try {
+  const { data: peopleData } = useQuery({
+    queryKey: ['people'],
+    queryFn: async () => {
       const response = await personClient.listPeople({ pageSize: 100, pageToken: 1 });
-      console.log('Fetched people:', response);
-      setPeople(response.people);
-    } catch (err) {
-      console.error('Error fetching people:', err);
-    }
-  };
+      return response.people;
+    },
+  });
 
-  useEffect(() => {
-    fetchPeople();
-  }, []);
+  const queryClient = useQueryClient();
+
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   const handleAddPerson = async (person: Person) => {
     try {
       await personClient.createPerson({ person });
-      fetchPeople();
+      queryClient.invalidateQueries({ queryKey: ['people'] });
       setSelectedPerson(null);
     } catch (err) {
       console.error('Error adding person:', err);
@@ -36,7 +32,8 @@ function App() {
   const handleUpdatePerson = async (person: Person) => {
     try {
       await personClient.updatePerson({ person });
-      fetchPeople();
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+
       setSelectedPerson(null);
     } catch (err) {
       console.error('Error updating person:', err);
@@ -46,7 +43,8 @@ function App() {
   const handleDeletePerson = async (id: string) => {
     try {
       await personClient.deletePerson({ id });
-      fetchPeople();
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+
       if (selectedPerson?.id === id) {
         setSelectedPerson(null);
       }
@@ -68,7 +66,11 @@ function App() {
           />
         </div>
         <div className="person-list">
-          <PersonList people={people} onSelectPerson={setSelectedPerson} onDeletePerson={handleDeletePerson} />
+          <PersonList
+            people={peopleData || []}
+            onSelectPerson={setSelectedPerson}
+            onDeletePerson={handleDeletePerson}
+          />
         </div>
       </div>
     </div>
