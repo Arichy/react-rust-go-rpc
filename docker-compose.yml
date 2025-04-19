@@ -1,0 +1,43 @@
+services:
+  # Backend Rust gRPC server
+  backend:
+    build:
+      context: ./
+      dockerfile: ./backend/Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - RUST_LOG=debug
+    networks:
+      - app-network
+  
+  # # Frontend React TypeScript app
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app/frontend
+  #     - /app/frontend/node_modules
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - VITE_API_URL=http://localhost:50051
+  #   networks:
+  #     - app-network
+
+  # Envoy proxy for gRPC-Web support
+  envoy:
+    image: envoyproxy/envoy:v1.33-latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    command: ["-c", "/etc/envoy/envoy.yaml"]
+    networks:
+      - app-network
+
+networks:
+  app-network:

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package person;
+
+// The Person message represents an individual person in our system
+message Person {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  int32 age = 4;
+}
+
+// Request message for creating a new person
+message CreatePersonRequest {
+  Person person = 1;
+}
+
+// Response message for creating a new person
+message CreatePersonResponse {
+  Person person = 1;
+}
+
+// Request message for retrieving a person by ID
+message GetPersonRequest {
+  string id = 1;
+}
+
+// Response message for getting a person
+message GetPersonResponse {
+  Person person = 1;
+}
+
+// Request message for updating a person
+message UpdatePersonRequest {
+  Person person = 1;
+}
+
+// Response message for updating a person
+message UpdatePersonResponse {
+  Person person = 1;
+}
+
+// Request message for deleting a person
+message DeletePersonRequest {
+  string id = 1;
+}
+
+// Response message for deleting a person
+message DeletePersonResponse {
+  bool success = 1;
+}
+
+// Request message for listing people
+message ListPeopleRequest {
+  // Optional pagination fields
+  int32 page_size = 1;
+  int32 page_token = 2;
+}
+
+// Response message for listing people
+message ListPeopleResponse {
+  repeated Person people = 1;
+  int32 next_page_token = 2;
+}
+
+// The PersonService provides CRUD operations for managing people
+service PersonService {
+  // Create a new person
+  rpc CreatePerson (CreatePersonRequest) returns (CreatePersonResponse);
+
+  // Get a person by ID
+  rpc GetPerson (GetPersonRequest) returns (GetPersonResponse);
+
+  // Update an existing person
+  rpc UpdatePerson (UpdatePersonRequest) returns (UpdatePersonResponse);
+
+  // Delete a person by ID
+  rpc DeletePerson (DeletePersonRequest) returns (DeletePersonResponse);
+
+  // List all people with optional pagination
+  rpc ListPeople (ListPeopleRequest) returns (ListPeopleResponse);
+}
