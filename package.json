@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A full-stack application with React TypeScript frontend and Rust backend using gRPC",
   "scripts": {
-    "start:frontend": "cd frontend && pnpm run dev",
+    "start:frontend": "cd frontend && yarn dev",
     "start:backend": "cd backend && cargo run",
-    "install:all": "pnpm install && cd frontend && pnpm install",
+    "install:all": "yarn install && cd frontend && yarn install",
     "generate-proto": "cd frontend && pnpm run generate-proto"
   },
   "keywords": [

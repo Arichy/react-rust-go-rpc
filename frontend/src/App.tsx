@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import PersonList from './components/PersonList';
 import PersonForm from './components/PersonForm';
-import { Person } from './generated/person';
+import { Person, } from './gen/person_pb';
 import { personClient } from './proxy';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
     try {
       const response = await personClient.listPeople({ pageSize: 100, pageToken: 1 });
       console.log('Fetched people:', response);
-      setPeople(response.response.people);
+      setPeople(response.people);
     } catch (err) {
       console.error('Error fetching people:', err);
     }

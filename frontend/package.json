@@ -8,31 +8,42 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "generate-proto": "mkdir -p src/generated && protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=src/generated --ts_opt=output_javascript,long_type_string ../proto/person.proto",
-    "proto-gen": "mkdir -p src/generated && protoc -I=../proto --ts_out=src/generated ../proto/person.proto"
+    "gen-proto": "buf generate"
   },
   "dependencies": {
-    "@protobuf-ts/grpcweb-transport": "^2.9.0",
-    "@protobuf-ts/plugin": "^2.9.0",
-    "@protobuf-ts/runtime": "^2.9.0",
-    "@protobuf-ts/runtime-rpc": "^2.9.0",
-    "google-protobuf": "^3.21.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@bufbuild/protobuf": "^2.2.5",
+    "@connectrpc/connect": "^2.0.2",
+    "@connectrpc/connect-web": "^2.0.2",
+    "connect-devtools": "^1.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.4.5",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-react": "^4.0.3",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "@bufbuild/buf": "^1.52.1",
+    "@bufbuild/protoc-gen-es": "^2.2.5",
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.30.1",
+    "@vitejs/plugin-react-swc": "^3.9.0",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "ts-proto": "^1.146.0",
+    "long": "^5.2.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5",
-    "long": "^5.2.0"
-  }
+    "vite": "^6.3.2"
+  },
+  "_dependencyComments": {
+    "grpc-web": "support the ability to communicate with gRPC services from a web browser, depended on by protoc-gen-grpc-web, like axios",
+    "google-protobuf": "protobuf library for JavaScript, depended on by protoc-gen-js, like JSON.parse",
+    "protoc-gen-js": "generate pure js data code from proto files",
+    "protoc-gen-grpc-web": "generate gRPC client method code",
+    "@bufbuild/buf": "the compiler to compile proto",
+    "@bufbuild/protoc-gen-es": "plugin of @bufbuild/buf, generate ES module code from proto files",
+    "@bufbuild/protobuf": "protobuf runtime for JavaScript, handles the serialization and deserialization of protobuf messages",
+    "@connectrpc/connect": "Connect RPC library for JavaScript, provides the core functionality for making RPC calls without the specific transport layer",
+    "@connectrpc/connect-web": "Connect RPC library for JavaScript, provides the transport layer for making RPC calls in a web browser"
+  },
+  "packageManager": "yarn@4.9.1"
 }

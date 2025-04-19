@@ -1,7 +1,7 @@
 pub mod in_memory_repository;
 
-use async_trait::async_trait;
 use crate::person::Person;
+use async_trait::async_trait;
 use thiserror::Error;
 
 #[derive(Error, Debug)]

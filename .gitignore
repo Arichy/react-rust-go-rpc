@@ -8,7 +8,7 @@ pnpm-debug.log
 # Frontend
 frontend/dist/
 frontend/node_modules/
-frontend/src/generated/
+frontend/src/gen/
 
 # Rust
 backend/target/

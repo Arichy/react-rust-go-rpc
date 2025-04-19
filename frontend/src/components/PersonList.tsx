@@ -1,9 +1,9 @@
-import { Person } from '../generated/person'
+import { Person } from '../gen/person_pb';
 
 interface PersonListProps {
-  people: Person[]
-  onSelectPerson: (person: Person) => void
-  onDeletePerson: (id: string) => void
+  people: Person[];
+  onSelectPerson: (person: Person) => void;
+  onDeletePerson: (id: string) => void;
 }
 
 function PersonList({ people, onSelectPerson, onDeletePerson }: PersonListProps) {
@@ -24,30 +24,29 @@ function PersonList({ people, onSelectPerson, onDeletePerson }: PersonListProps)
             </tr>
           </thead>
           <tbody>
-            {people.map((person) => (
-              <tr key={person.id}>
-                <td>{person.id}</td>
-                <td>{person.name}</td>
-                <td>{person.email}</td>
-                <td>{person.age}</td>
-                <td>
-                  <div className="button-group">
-                    <button onClick={() => onSelectPerson(person)}>Edit</button>
-                    <button 
-                      className="danger" 
-                      onClick={() => onDeletePerson(person.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {people.map(person => {
+              return (
+                <tr key={person.id}>
+                  <td>{person.id}</td>
+                  <td>{person.name}</td>
+                  <td>{person.email}</td>
+                  <td>{person.age}</td>
+                  <td>
+                    <div className="button-group">
+                      <button onClick={() => onSelectPerson(person)}>Edit</button>
+                      <button className="danger" onClick={() => onDeletePerson(person.id)}>
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
     </div>
-  )
+  );
 }
 
-export default PersonList
+export default PersonList;

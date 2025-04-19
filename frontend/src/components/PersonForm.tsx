@@ -1,46 +1,63 @@
-import { useState, useEffect } from 'react'
-import { Person } from '../generated/person'
+import { useState, useEffect } from 'react';
+import { Person, PersonSchema } from '../gen/person_pb';
+import { create } from '@bufbuild/protobuf';
 
 interface PersonFormProps {
-  selectedPerson: Person | null
-  onAddPerson: (person: Person) => void
-  onUpdatePerson: (person: Person) => void
-  onCancel: () => void
+  selectedPerson: Person | null;
+  onAddPerson: (person: Person) => void;
+  onUpdatePerson: (person: Person) => void;
+  onCancel: () => void;
 }
 
 function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: PersonFormProps) {
-  const [person, setPerson] = useState<Person>({
-    id: '',
-    name: '',
-    email: '',
-    age: 0
-  })
+  const [person, setPerson] = useState<Person>(
+    create(PersonSchema, {
+      id: '',
+      name: '',
+      email: '',
+      age: 0,
+    })
+  );
 
   useEffect(() => {
     if (selectedPerson) {
-      setPerson({ ...selectedPerson })
+      setPerson({ ...selectedPerson });
     } else {
-      setPerson({ id: '', name: '', email: '', age: 0 })
+      setPerson(
+        create(PersonSchema, {
+          id: '',
+          name: '',
+          email: '',
+          age: 0,
+        })
+      );
     }
-  }, [selectedPerson])
+  }, [selectedPerson]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setPerson({
       ...person,
-      [name]: name === 'age' ? parseInt(value, 10) || 0 : value
-    })
-  }
+      [name]: name === 'age' ? parseInt(value, 10) || 0 : value,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (selectedPerson) {
-      onUpdatePerson(person)
+      onUpdatePerson(person);
     } else {
-      onAddPerson(person)
+      onAddPerson(person);
     }
-    setPerson({ id: '', name: '', email: '', age: 0 })
-  }
+    setPerson(
+      create(PersonSchema, {
+        id: '',
+        name: '',
+        email: '',
+        age: 0,
+      })
+    );
+  };
 
   return (
     <div>
@@ -48,37 +65,15 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={person.name}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" id="name" name="name" value={person.name} onChange={handleChange} required />
         </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={person.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="email" id="email" name="email" value={person.email} onChange={handleChange} required />
         </div>
         <div className="form-group">
           <label htmlFor="age">Age</label>
-          <input
-            type="number"
-            id="age"
-            name="age"
-            value={person.age}
-            onChange={handleChange}
-            required
-            min={0}
-          />
+          <input type="number" id="age" name="age" value={person.age} onChange={handleChange} required min={0} />
         </div>
         <div className="button-group">
           <button type="button" className="secondary" onClick={onCancel}>
@@ -90,7 +85,7 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
         </div>
       </form>
     </div>
-  )
+  );
 }
 
-export default PersonForm
+export default PersonForm;
