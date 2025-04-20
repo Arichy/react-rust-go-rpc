@@ -10,7 +10,7 @@ services:
   #     - RUST_LOG=debug
   #   networks:
   #     - app-network
-  
+
   # # Frontend React TypeScript app
   # frontend:
   #   build:
@@ -32,12 +32,11 @@ services:
   envoy:
     image: envoyproxy/envoy:v1.33-latest
     ports:
-      - "8080:8080"
+      - '8080:8080'
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
-    command: ["-c", "/etc/envoy/envoy.yaml"]
-    networks:
-      - app-network
-
-networks:
-  app-network:
+    # command: ['-c', '/etc/envoy/envoy.yaml']
+    # networks:
+    # - app-network
+# networks:
+#   app-network:

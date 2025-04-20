@@ -35,3 +35,5 @@ backend/Cargo.lock
 # OS specific
 .DS_Store
 Thumbs.db
+
+frontend/.yarn/install-state.gz
