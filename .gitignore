@@ -11,8 +11,11 @@ frontend/node_modules/
 frontend/src/gen/
 
 # Rust
-backend/target/
-backend/Cargo.lock
+rust-grpc-backend/target/
+rust-grpc-backend/Cargo.lock
+
+# Go
+go-connect-backend/tmp/
 
 # Environment variables
 .env

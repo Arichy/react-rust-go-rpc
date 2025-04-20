@@ -1,7 +1,7 @@
 import { createClient, Transport } from '@connectrpc/connect';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 
-import { PersonService } from './gen/person_pb';
+import { PersonService } from '@src/gen/person_pb';
 
 const apiUrl = 'http://localhost:8080';
 

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package person;
 
+option go_package = "example.com/go-connect-backend/gen;person";
+
 // The Person message represents an individual person in our system
 message Person {
   string id = 1;
