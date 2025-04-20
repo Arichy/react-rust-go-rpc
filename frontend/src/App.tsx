@@ -3,7 +3,7 @@ import './App.css';
 import PersonList from './components/PersonList';
 import PersonForm from './components/PersonForm';
 import { Person, PersonService } from './gen/person_pb';
-import { personClient } from './proxy';
+import { personClient } from './grpc';
 import { useQueryClient } from '@tanstack/react-query';
 import { createConnectQueryKey, useQuery, useTransport } from '@connectrpc/connect-query';
 

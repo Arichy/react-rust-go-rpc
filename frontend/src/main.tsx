@@ -4,7 +4,7 @@ import App from './App.tsx';
 import './index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TransportProvider } from '@connectrpc/connect-query';
-import { transport } from './proxy.ts';
+import { transport } from './grpc.ts';
 
 const queryClient = new QueryClient();
 
