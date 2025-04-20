@@ -5,7 +5,7 @@ import PersonForm from './components/PersonForm';
 import { Person, PersonService } from './gen/person_pb';
 import { personClient } from './proxy';
 import { useQueryClient } from '@tanstack/react-query';
-import { useQuery } from '@connectrpc/connect-query';
+import { createConnectQueryKey, useQuery, useTransport } from '@connectrpc/connect-query';
 
 function App() {
   // const { data: peopleData } = useQuery({
@@ -16,6 +16,13 @@ function App() {
   //   },
   // });
 
+  const transport = useTransport();
+  const peopleQueryKey = createConnectQueryKey({
+    schema: PersonService.method.listPeople,
+    transport,
+    input: { pageSize: 100, pageToken: 1 },
+    cardinality: 'finite',
+  });
   const { data } = useQuery(PersonService.method.listPeople, { pageSize: 100, pageToken: 1 });
   const people = data?.people || [];
 
@@ -26,7 +33,7 @@ function App() {
   const handleAddPerson = async (person: Person) => {
     try {
       await personClient.createPerson({ person });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: peopleQueryKey });
       setSelectedPerson(null);
     } catch (err) {
       console.error('Error adding person:', err);
@@ -36,7 +43,7 @@ function App() {
   const handleUpdatePerson = async (person: Person) => {
     try {
       await personClient.updatePerson({ person });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: peopleQueryKey });
 
       setSelectedPerson(null);
     } catch (err) {
@@ -47,7 +54,7 @@ function App() {
   const handleDeletePerson = async (id: string) => {
     try {
       await personClient.deletePerson({ id });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: peopleQueryKey });
 
       if (selectedPerson?.id === id) {
         setSelectedPerson(null);

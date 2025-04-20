@@ -65,7 +65,15 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
-          <input type="text" id="name" name="name" value={person.name} onChange={handleChange} required />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={person.name}
+            onChange={handleChange}
+            required
+            autoComplete="off"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
