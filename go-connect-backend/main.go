@@ -96,7 +96,7 @@ func withCORS(h http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Headers",
 			"Content-Type, Connect-Protocol-Version, Connect-Timeout-Ms, X-User-Agent, X-Grpc-Web")
 
-		// 如果是预检请求，直接返回 200
+		// return 200 for preflight request
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
 			return
