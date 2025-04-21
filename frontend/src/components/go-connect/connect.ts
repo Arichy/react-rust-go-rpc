@@ -7,6 +7,7 @@ const apiUrl = 'http://localhost:8081';
 
 export const transport: Transport = createConnectTransport({
   baseUrl: apiUrl,
+  // useBinaryFormat: true, // if set to true, the client will use binary format
 });
 
 export const personClient = createClient(PersonService, transport);

@@ -1,77 +1,82 @@
 # Person CRUD gRPC Application
 
-This is a full-stack application with a React TypeScript frontend using Vite and a Rust backend, communicating via gRPC.
+This is a full-stack application with a React TypeScript frontend using Vite, a Rust gRPC backend, and a Go connect backend.
+
+![alt text](image.png)
 
 ## Project Structure
 
 - `/frontend`: React TypeScript frontend built with Vite
-- `/backend`: Rust backend with gRPC
+- `/rust-grpc-backend`: Rust backend with gRPC
+- `/go-connect-backend`: Go backend with connect
 - `/proto`: Protocol buffer definitions shared between frontend and backend
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (v16+)
-- [pnpm](https://pnpm.io/) 
-- [Rust and Cargo](https://www.rust-lang.org/tools/install)
-- [Protobuf Compiler](https://grpc.io/docs/protoc-installation/) (protoc)
+- Node.js
+- Rust and Cargo
+- Go (for the Go backend)
+- Docker (for running Envoy)
+- [Protobuf Compiler](https://grpc.io/docs/protoc-installation/) (protoc) - Optional, because @bufbuild/buf is used for generating code in the repo
 
 ## Setup Instructions
 
-### Initial Setup
-
-1. Clone the repository
-2. Install dependencies:
-
 ```bash
-# Install root and frontend dependencies
-pnpm install:all
+# Run frontend
+cd frontend
+yarn install
+yarn gen-proto # Generate TypeScript code from proto files
+yarn dev # Start the frontend server
 
-# Install Rust backend dependencies
-cd backend
-cargo build
+
+# Run rust grpc server
+cd rust-grpc-backend
+cargo run
+
+# Run envoy
+docker-compose up
+
+# Install Go tools for building and generating connect code (installed globally)
+go install github.com/bufbuild/buf/cmd/buf@latest
+go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
+
+# Run go connect server
+cd go-connect-backend
+buf generate # Generate Go code from proto files
+go run .
 ```
 
-### Generate Protocol Buffers
-
-```bash
-# Generate TypeScript code from proto files
-pnpm generate-proto
-```
-
-### Run the Application
-
-1. Start the backend:
-
-```bash
-pnpm start:backend
-```
-
-2. Start the frontend in a new terminal:
-
-```bash
-pnpm start:frontend
-```
-
-3. Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
+Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Features
 
 - Create, Read, Update, Delete operations for people
-- Type-safe communication between frontend and backend using gRPC
+- Type-safe communication between frontend and backend using gRPC/connect
 - Real-time data updates
 
 ## Technologies Used
 
 - **Frontend**:
+
   - React with TypeScript
   - Vite for fast development
-  - gRPC-Web for communication
+  - Buf for compiling protocol buffers
+  - Connect for communication
 
-- **Backend**:
+- **Rust gRPC Backend**:
+
   - Rust
   - Tonic for gRPC implementation
   - In-memory storage (can be extended to use a database)
 
+- **Go Connect Backend**:
+
+  - Go
+  - Buf for compiling protocol buffers
+  - Connect for gRPC implementation
+  - In-memory storage (can be extended to use a database)
+
 - **Shared**:
   - Protocol Buffers for type definitions
-  - gRPC for API communication
