@@ -22,30 +22,17 @@ This is a full-stack application with a React TypeScript frontend using Vite, a 
 ## Setup Instructions
 
 ```bash
-# Run frontend
-cd frontend
-yarn install
-yarn gen-proto # Generate TypeScript code from proto files
-yarn dev # Start the frontend server
+chmod +x ./setup.sh
+./setup.sh
+```
 
+And then
 
-# Run rust grpc server
-cd rust-grpc-backend
-cargo run
-
-# Run envoy
+```bash
 docker-compose up
-
-# Install Go tools for building and generating connect code (installed globally)
-go install github.com/bufbuild/buf/cmd/buf@latest
-go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
-
-# Run go connect server
-cd go-connect-backend
-buf generate # Generate Go code from proto files
-go run .
+yarn start:frontend
+yarn start:rust
+yarn start:go
 ```
 
 Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
