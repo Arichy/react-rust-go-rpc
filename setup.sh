@@ -8,17 +8,15 @@ echo "Setting up Person CRUD gRPC Application..."
 echo "Installing frontend dependencies..."
 cd frontend
 yarn install
-
 # Generate TypeScript files from proto definitions
 echo "Generating TypeScript code from proto files..."
 yarn gen-proto
+cd ..
 
 # Install rust dependencies
 echo "Building Rust backend..."
-cd backend
+cd rust-grpc-server
 cargo build
-
-# Return to the root directory
 cd ..
 
 # Install Go tools for building and generating connect code (installed globally)
@@ -28,7 +26,9 @@ go install github.com/bufbuild/buf/cmd/buf@latest
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
 
-# Return to the root directory
+# Build proto files for Go
+cd go-connect-server
+buf generate
 cd ..
 
 echo "Setup complete! You can now run the application:"
