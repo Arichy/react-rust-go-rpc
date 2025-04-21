@@ -15,7 +15,7 @@ cd ..
 
 # Install rust dependencies
 echo "Building Rust backend..."
-cd rust-grpc-server
+cd rust-grpc-backend
 cargo build
 cd ..
 
@@ -27,12 +27,12 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
 
 # Build proto files for Go
-cd go-connect-server
+cd go-connect-backend
 buf generate
 cd ..
 
 echo "Setup complete! You can now run the application:"
 echo "- Start envoy: docker-compose up"
-echo "- Start frontend: yarn start:backend"
+echo "- Start frontend: yarn start:frontend"
 echo "- Start Rust server: yarn start:rust"
 echo "- Start Go server: yarn start:go"
