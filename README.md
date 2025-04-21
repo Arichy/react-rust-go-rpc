@@ -2,7 +2,7 @@
 
 This is a full-stack application with a React TypeScript frontend using Vite, a Rust gRPC backend, and a Go connect backend.
 
-![alt text](image.png)
+![alt text](imgs/preview.png)
 
 ## Project Structure
 
@@ -10,6 +10,9 @@ This is a full-stack application with a React TypeScript frontend using Vite, a 
 - `/rust-grpc-backend`: Rust backend with gRPC
 - `/go-connect-backend`: Go backend with connect
 - `/proto`: Protocol buffer definitions shared between frontend and backend
+
+## Architecture
+![alt text](imgs/architecture.png)
 
 ## Prerequisites
 
