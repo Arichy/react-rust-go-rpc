@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Person, PersonSchema } from '@src/gen/person_pb';
 import { create } from '@bufbuild/protobuf';
+import { personClient } from './connect';
+import PersonModal from './PersonModal';
 
 interface PersonFormProps {
   selectedPerson: Person | null;
@@ -18,6 +20,10 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
       age: 0,
     })
   );
+  const [showModal, setShowModal] = useState(false);
+  const [personDetails, setPersonDetails] = useState<Person | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedPerson) {
@@ -59,12 +65,83 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
     );
   };
 
+  const fetchPersonDetails = async (id: string) => {
+    if (!id) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await personClient.getPerson({ id });
+      if (response.person) {
+        setPersonDetails(response.person);
+        setShowModal(true);
+      } else {
+        setError('Person details not found');
+      }
+    } catch (err) {
+      console.error('Error fetching person details:', err);
+      setError('Failed to load person details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleIdClick = () => {
+    if (person.id) {
+      fetchPersonDetails(person.id);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setPersonDetails(null);
+    setError(null);
+  };
+
   return (
     <div className="w-full">
       <h2 className="text-xl font-semibold text-primary pb-3 mb-4 border-b border-border">
         {selectedPerson ? 'Edit Person' : 'Add New Person'}
       </h2>
       <form onSubmit={handleSubmit}>
+        {selectedPerson && (
+          <div className="mb-4">
+            <label className="block mb-1 font-medium text-text" htmlFor="id">
+              ID
+            </label>
+            <div className="flex items-center">
+              <input
+                className="w-full px-3 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors hover:border-gray-400 bg-gray-50"
+                type="text"
+                id="id"
+                name="id"
+                value={person.id}
+                readOnly
+              />
+              <button
+                type="button"
+                className="ml-2 text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm flex items-center"
+                onClick={handleIdClick}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+        )}
         <div className="mb-4">
           <label className="block mb-1 font-medium text-text" htmlFor="name">
             Name
@@ -126,6 +203,14 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
           </button>
         </div>
       </form>
+
+      <PersonModal
+        isOpen={showModal}
+        onClose={closeModal}
+        personDetails={personDetails}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
 }

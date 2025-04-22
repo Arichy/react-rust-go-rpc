@@ -71,7 +71,7 @@ func (s *PeopleStorage) Delete(id string) (*person.Person, error) {
 	person, exists := s.data[id]
 
 	if !exists {
-		return nil, fmt.Errorf("person with id %v not found", person.Id)
+		return nil, fmt.Errorf("person with id %v not found", id)
 	}
 
 	delete(s.data, id)
