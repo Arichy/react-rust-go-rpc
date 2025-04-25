@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"connectrpc.com/connect"
 	person "example.com/go-connect-backend/gen"
@@ -22,18 +21,22 @@ type PersonService struct {
 	db      *gorm.DB
 }
 
-type Person struct {
-	Id        string `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string
-	Email     string
-	Age       int
+type ModelPerson struct {
+	Id        string `gorm:"primaryKey;not null"`
+	Name      string `gorm:"not null"`
+	Email     string `gorm:"not null"`
+	Age       int    `gorm:"not null"`
+	Address   string
+	CreatedAt int64 `gorm:"autoCreateTime;not null"`
+	UpdatedAt int64 `gorm:"autoCreateTime;not null"`
 }
 
-func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
+func (ModelPerson) TableName() string {
+	return "people"
+}
+
+func (p *ModelPerson) BeforeCreate(tx *gorm.DB) (err error) {
 	id := uuid.NewString()
-	fmt.Println(id)
 	p.Id = id
 
 	return
@@ -41,15 +44,30 @@ func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
 
 // Create a new person
 func (s *PersonService) CreatePerson(_ context.Context, req *connect.Request[person.CreatePersonRequest]) (*connect.Response[person.CreatePersonResponse], error) {
-	p := req.Msg.Person
 	var created *person.Person
 	var err error
 
 	if s.db != nil {
-		err = s.db.Create(ProtoToModel(p)).Error
-		created = p
+		toInsert := &ModelPerson{
+			Name:  req.Msg.Name,
+			Email: req.Msg.Email,
+			Age:   int(req.Msg.Age),
+		}
+
+		err = s.db.Create(toInsert).Error
+
+		created = ModelPersonToProtoPerson(toInsert)
 	} else {
-		created, err = s.storage.Create(p)
+		p := &person.PersonBrief{
+			Name:  req.Msg.Name,
+			Email: req.Msg.Email,
+			Age:   req.Msg.Age,
+		}
+		createdModel, err := s.storage.Create(p)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+		}
+		created = ModelPersonToProtoPerson(createdModel)
 	}
 
 	if err != nil {
@@ -70,11 +88,15 @@ func (s *PersonService) GetPerson(_ context.Context, req *connect.Request[person
 	var err error
 
 	if s.db != nil {
-		var modelPerson Person
+		var modelPerson ModelPerson
 		err = s.db.First(&modelPerson, "id = ?", id).Error
-		p = ModelToProto(&modelPerson)
+		p = ModelPersonToProtoPerson(&modelPerson)
 	} else {
-		p, err = s.storage.Get(id)
+		modelPerson, err := s.storage.Get(id)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		p = ModelPersonToProtoPerson(modelPerson)
 	}
 
 	if err != nil {
@@ -86,16 +108,35 @@ func (s *PersonService) GetPerson(_ context.Context, req *connect.Request[person
 
 // Update an existing person
 func (s *PersonService) UpdatePerson(_ context.Context, req *connect.Request[person.UpdatePersonRequest]) (_ *connect.Response[person.UpdatePersonResponse], _ error) {
-	p := req.Msg.Person
-
 	var updated *person.Person
 	var err error
 
 	if s.db != nil {
-		modelPerson := ProtoToModel(p)
-		err = s.db.Save(modelPerson).Error
+		updates := make(map[string]any)
+
+		if req.Msg.Name != nil {
+			updates["name"] = req.Msg.Name
+		}
+
+		if req.Msg.Email != nil {
+			updates["email"] = req.Msg.Email
+		}
+
+		if req.Msg.Age != nil {
+			updates["age"] = req.Msg.Age
+		}
+
+		if req.Msg.Address != nil {
+			updates["address"] = req.Msg.Address
+		}
+
+		err = s.db.Model(&ModelPerson{}).Where("id = ?", req.Msg.Id).Updates(updates).Error
 	} else {
-		updated, err = s.storage.Update(p)
+		modelPerson, err := s.storage.Update(req.Msg)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		updated = ModelPersonToProtoPerson(modelPerson)
 	}
 
 	if err != nil {
@@ -111,7 +152,7 @@ func (s *PersonService) DeletePerson(_ context.Context, req *connect.Request[per
 	var err error
 
 	if s.db != nil {
-		err = s.db.Delete(&Person{}, "id = ?", id).Error
+		err = s.db.Delete(&ModelPerson{}, "id = ?", id).Error
 	} else {
 		_, err = s.storage.Delete(id)
 	}
@@ -125,12 +166,17 @@ func (s *PersonService) DeletePerson(_ context.Context, req *connect.Request[per
 
 // List all people with optional pagination
 func (s *PersonService) ListPeople(_ context.Context, req *connect.Request[person.ListPeopleRequest]) (_ *connect.Response[person.ListPeopleResponse], _ error) {
-	var list []*person.Person
+	var modelList []*ModelPerson
 
 	if s.db != nil {
-		s.db.Find(&list)
+		s.db.Find(&modelList)
 	} else {
-		list, _ = s.storage.List()
+		modelList, _ = s.storage.List()
+	}
+
+	var list []*person.PersonBrief
+	for _, modelPerson := range modelList {
+		list = append(list, ModelPersonToProtoPersonBrief(modelPerson))
 	}
 
 	slice := list[0:]
@@ -146,7 +192,7 @@ func main() {
 		fmt.Println("Failed to open person.db")
 	}
 
-	db.AutoMigrate(&Person{})
+	db.AutoMigrate(&ModelPerson{})
 
 	storage := NewPeopleStorage()
 	svc := &PersonService{

@@ -16,6 +16,7 @@ rust-grpc-backend/Cargo.lock
 
 # Go
 go-connect-backend/tmp/
+go-connect-backend/gen/
 
 # Environment variables
 .env

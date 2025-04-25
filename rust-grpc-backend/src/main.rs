@@ -1,8 +1,14 @@
 mod person_service;
 mod repository;
 
+use std::env;
+
 use person_service::PersonServiceImpl;
-use repository::in_memory_repository::InMemoryRepository;
+use repository::{
+    in_memory_repository::InMemoryRepository,
+    sqlite_repository::{init_db, SqliteRepository},
+};
+use sqlx::SqlitePool;
 use tokio::signal;
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
@@ -13,10 +19,23 @@ pub mod person {
     tonic::include_proto!("person");
 }
 
+pub mod proto;
+pub mod utils;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenvy::dotenv()?;
+    std::env::set_var("DATABASE_URL", "sqlite://../../person.db");
+
+    let db_url = env::var("DATABASE_URL")?;
+
+    let pool = init_db().await?;
+
+    println!("Using database at:{db_url}");
+
     // Create a new in-memory repository
-    let repository = InMemoryRepository::new();
+    // let repository = InMemoryRepository::new();
+    let repository = SqliteRepository::new(pool);
 
     // Create the gRPC service
     let person_service = PersonServiceImpl::new(repository);

@@ -9,3 +9,9 @@
     /* -moz-osx-font-smoothing: grayscale; */
   }
 }
+
+html,
+body,
+#root {
+  min-height: 100%;
+}

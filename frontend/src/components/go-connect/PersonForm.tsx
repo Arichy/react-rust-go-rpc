@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Person, PersonSchema } from '@src/gen/person_pb';
+import { Person, PersonBrief, PersonBriefSchema, PersonSchema } from '@src/gen/person_pb';
 import { create } from '@bufbuild/protobuf';
 import { personClient } from './connect';
 import PersonModal from './PersonModal';
 
 interface PersonFormProps {
   selectedPerson: Person | null;
-  onAddPerson: (person: Person) => void;
+  onAddPerson: (person: PersonBrief) => void;
   onUpdatePerson: (person: Person) => void;
   onCancel: () => void;
 }
@@ -53,7 +53,14 @@ function PersonForm({ selectedPerson, onAddPerson, onUpdatePerson, onCancel }: P
     if (selectedPerson) {
       onUpdatePerson(person);
     } else {
-      onAddPerson(person);
+      onAddPerson(
+        create(PersonBriefSchema, {
+          id: person.id,
+          name: person.name,
+          email: person.email,
+          age: person.age,
+        })
+      );
     }
     setPerson(
       create(PersonSchema, {

@@ -10,16 +10,16 @@ import (
 
 type PeopleStorage struct {
 	mu   sync.Mutex
-	data map[string]*person.Person
+	data map[string]*ModelPerson
 }
 
 func NewPeopleStorage() *PeopleStorage {
 	return &PeopleStorage{
-		data: make(map[string]*person.Person),
+		data: make(map[string]*ModelPerson),
 	}
 }
 
-func (s *PeopleStorage) Create(person *person.Person) (*person.Person, error) {
+func (s *PeopleStorage) Create(person *person.PersonBrief) (*ModelPerson, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -31,12 +31,14 @@ func (s *PeopleStorage) Create(person *person.Person) (*person.Person, error) {
 		person.Id = uuid.NewString()
 	}
 
-	s.data[person.Id] = person
+	modelPerson := ProtoPersonBriefToModelPerson(person)
 
-	return person, nil
+	s.data[person.Id] = modelPerson
+
+	return modelPerson, nil
 }
 
-func (s *PeopleStorage) Get(id string) (*person.Person, error) {
+func (s *PeopleStorage) Get(id string) (*ModelPerson, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -49,22 +51,33 @@ func (s *PeopleStorage) Get(id string) (*person.Person, error) {
 	return person, nil
 }
 
-func (s *PeopleStorage) Update(person *person.Person) (*person.Person, error) {
+func (s *PeopleStorage) Update(req *person.UpdatePersonRequest) (*ModelPerson, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	_, exists := s.data[person.Id]
+	p, exists := s.data[req.Id]
 	if !exists {
-		return nil, fmt.Errorf("person with id %v not found", person.Id)
+		return nil, fmt.Errorf("person with id %v not found", req.Id)
 	}
 
-	s.data[person.Id] = person
-	fmt.Println("updated:", person)
+	if req.Name != nil {
+		p.Name = *req.Name
+	}
 
-	return person, nil
+	if req.Email != nil {
+		p.Email = *req.Email
+	}
+	if req.Age != nil {
+		p.Age = int(*req.Age)
+	}
+	if req.Address != nil {
+		p.Address = *req.Address
+	}
+
+	return p, nil
 }
 
-func (s *PeopleStorage) Delete(id string) (*person.Person, error) {
+func (s *PeopleStorage) Delete(id string) (*ModelPerson, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -78,11 +91,11 @@ func (s *PeopleStorage) Delete(id string) (*person.Person, error) {
 	return person, nil
 }
 
-func (s *PeopleStorage) List() ([]*person.Person, error) {
+func (s *PeopleStorage) List() ([]*ModelPerson, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	list := make([]*person.Person, 0, len(s.data))
+	list := make([]*ModelPerson, 0, len(s.data))
 	for _, p := range s.data {
 		list = append(list, p)
 	}

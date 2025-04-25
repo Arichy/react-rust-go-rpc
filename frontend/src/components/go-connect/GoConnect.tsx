@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PersonList from './PersonList';
 import PersonForm from './PersonForm';
-import { Person, PersonService } from '@src/gen/person_pb';
+import { Person, PersonBrief, PersonBriefSchema, PersonService } from '@src/gen/person_pb';
 import { personClient } from './connect';
 import { useQueryClient } from '@tanstack/react-query';
 import { createConnectQueryKey, useQuery, useTransport } from '@connectrpc/connect-query';
@@ -21,7 +21,7 @@ function GoConnect() {
 
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
-  const handleAddPerson = async (person: Person) => {
+  const handleAddPerson = async (person: PersonBrief) => {
     try {
       await personClient.createPerson({ person });
       queryClient.invalidateQueries({ queryKey: peopleQueryKey });

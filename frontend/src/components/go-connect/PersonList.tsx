@@ -1,7 +1,7 @@
-import { Person } from '../../gen/person_pb';
+import { Person, PersonBrief } from '../../gen/person_pb';
 
 interface PersonListProps {
-  people: Person[];
+  people: PersonBrief[];
   onSelectPerson: (person: Person) => void;
   onDeletePerson: (id: string) => void;
 }
