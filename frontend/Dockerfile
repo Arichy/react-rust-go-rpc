@@ -4,14 +4,14 @@ RUN corepack enable && corepack prepare yarn@stable --activate
 
 WORKDIR /app
 
-COPY ./frontend/package.json ./frontend/yarn.lock ./frontend/
+COPY ./frontend/package.json ./frontend/yarn.lock ./frontend/.yarnrc.yml ./frontend/
 
 COPY ./proto ./proto
 
 WORKDIR /app/frontend
-RUN yarn install --check-cache
+RUN yarn install --immutable
 
-COPY ./frontend /app/frontend
+COPY ./frontend/ .
 RUN yarn gen-proto && yarn build
 
 # Production stage

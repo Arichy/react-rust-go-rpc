@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"connectrpc.com/connect"
@@ -186,12 +187,35 @@ func (s *PersonService) ListPeople(_ context.Context, req *connect.Request[perso
 }
 
 func main() {
-	dsn := "host=localhost user=user password=password dbname=person_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	if dbHost == "" {
+		dbHost = "localhost"
+	}
+	if dbPort == "" {
+		dbPort = "5432"
+	}
+	if dbUser == "" {
+		dbUser = "user"
+	}
+	if dbPassword == "" {
+		dbPassword = "password"
+	}
+	if dbName == "" {
+		dbName = "person_db"
+	}
+
+	// dsn := "host=localhost user=user password=password dbname=person_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", dbHost, dbUser, dbPassword, dbName, dbPort)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		fmt.Println(db)
-		fmt.Println("Failed to open person.db")
+		fmt.Println("Failed to open database connection, err:", err)
+		return
 	}
 
 	db.AutoMigrate(&ModelPerson{})

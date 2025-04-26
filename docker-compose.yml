@@ -5,8 +5,16 @@ services:
       dockerfile: ./go-connect-backend/Dockerfile
     ports:
       - '8081:8081'
-    volumes:
-      - ./person.db:/person.db
+    environment:
+      - DB_HOST=pg
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=person_db
+
+    depends_on:
+      - pg
+
     # networks:
     #   - app-network
 
@@ -18,9 +26,10 @@ services:
     ports:
       - '50051:50051'
     environment:
-      - DATABASE_URL=sqlite://person.db
-    volumes:
-      - ./person.db:/person.db
+      - DATABASE_URL=postgres://user:password@pg:5432/person_db
+    depends_on:
+      - pg
+
     # networks:
     #   - app-network
 
@@ -60,3 +69,6 @@ services:
       - pg_data:/var/lib/postgresql/data
 # networks:
 #   app-network:
+
+volumes:
+  pg_data:

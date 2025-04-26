@@ -13,9 +13,9 @@ RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release
 WORKDIR /app
 COPY ./rust-grpc-backend ./rust-grpc-backend
 COPY ./proto ./proto
-COPY ./person.db ./person.db
 
 WORKDIR /app/rust-grpc-backend
+ENV SQLX_OFFLINE=true
 RUN cargo build --release
 
 FROM debian:bookworm-slim

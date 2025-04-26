@@ -4,8 +4,9 @@
   "description": "A full-stack application with React TypeScript frontend and Rust backend using gRPC",
   "scripts": {
     "start:frontend": "cd frontend && yarn dev",
-    "start:rust": "cd rust-grpc-backend && cargo run",
-    "start:go": "cd go-connect-backend && go run ."
+    "start:rust": "wait-on tcp:localhost:5432 && cd rust-grpc-backend && cargo run",
+    "start:go": "wait-on tcp:localhost:5432 && cd go-connect-backend && go run .",
+    "dev": "concurrently \"docker-compose -f docker-compose.dev.yml up\" \"yarn start:frontend\" \"yarn start:rust\" \"yarn start:go\""
   },
   "keywords": [
     "react",
@@ -17,5 +18,9 @@
   ],
   "author": "arichyx@qq.com",
   "license": "ISC",
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.3"
+  }
 }
