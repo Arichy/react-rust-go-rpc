@@ -12,6 +12,7 @@ This is a full-stack application with a React TypeScript frontend using Vite, a 
 - `/proto`: Protocol buffer definitions shared between frontend and backend
 
 ## Architecture
+
 ![alt text](imgs/architecture.png)
 
 ## Prerequisites
@@ -19,7 +20,7 @@ This is a full-stack application with a React TypeScript frontend using Vite, a 
 - Node.js
 - Rust and Cargo
 - Go (for the Go backend)
-- Docker (for running Envoy)
+- Docker (for running Envoy & PostgreSQL)
 - [Protobuf Compiler](https://grpc.io/docs/protoc-installation/) (protoc) - Optional, because @bufbuild/buf is used for generating code in the repo
 
 ## Setup Instructions
@@ -32,7 +33,7 @@ chmod +x ./setup.sh
 And then
 
 ```bash
-docker-compose up
+docker-compose -f docker-compose.dev.yml up
 yarn start:frontend
 yarn start:rust
 yarn start:go

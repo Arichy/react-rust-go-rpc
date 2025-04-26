@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"connectrpc.com/connect"
 	person "example.com/go-connect-backend/gen"
@@ -12,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -25,10 +26,10 @@ type ModelPerson struct {
 	Id        string `gorm:"primaryKey;not null"`
 	Name      string `gorm:"not null"`
 	Email     string `gorm:"not null"`
-	Age       int    `gorm:"not null"`
+	Age       int32  `gorm:"not null"`
 	Address   string
-	CreatedAt int64 `gorm:"autoCreateTime;not null"`
-	UpdatedAt int64 `gorm:"autoCreateTime;not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime;type:timestamptz;default:now();not null"`
+	UpdatedAt time.Time `gorm:"autoCreateTime;type:timestamptz;default:now();not null"`
 }
 
 func (ModelPerson) TableName() string {
@@ -51,7 +52,7 @@ func (s *PersonService) CreatePerson(_ context.Context, req *connect.Request[per
 		toInsert := &ModelPerson{
 			Name:  req.Msg.Name,
 			Email: req.Msg.Email,
-			Age:   int(req.Msg.Age),
+			Age:   req.Msg.Age,
 		}
 
 		err = s.db.Create(toInsert).Error
@@ -169,7 +170,7 @@ func (s *PersonService) ListPeople(_ context.Context, req *connect.Request[perso
 	var modelList []*ModelPerson
 
 	if s.db != nil {
-		s.db.Find(&modelList)
+		s.db.Order("created_at").Find(&modelList)
 	} else {
 		modelList, _ = s.storage.List()
 	}
@@ -185,7 +186,8 @@ func (s *PersonService) ListPeople(_ context.Context, req *connect.Request[perso
 }
 
 func main() {
-	db, err := gorm.Open(sqlite.Open("../person.db"), &gorm.Config{})
+	dsn := "host=localhost user=user password=password dbname=person_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		fmt.Println(db)

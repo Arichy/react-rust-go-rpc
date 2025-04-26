@@ -1,11 +1,12 @@
+pub mod db_repository;
 pub mod in_memory_repository;
-pub mod sqlite_repository;
 
 use crate::person::{
     CreatePersonRequest, DeletePersonRequest, GetPersonRequest, ListPeopleRequest, Person,
     PersonBrief, UpdatePersonRequest,
 };
 use async_trait::async_trait;
+use sqlx::types::time::OffsetDateTime;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -20,15 +21,29 @@ pub enum RepositoryError {
     DbError(String),
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct ModelPerson {
     pub id: String,
     pub name: String,
     pub email: String,
-    pub age: i64,
+    pub age: i32,
     pub address: Option<String>,
-    pub created_at: i64,
-    pub updated_at: i64,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
+}
+
+impl Default for ModelPerson {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            email: Default::default(),
+            age: Default::default(),
+            address: Default::default(),
+            created_at: OffsetDateTime::now_utc(),
+            updated_at: OffsetDateTime::now_utc(),
+        }
+    }
 }
 
 impl ModelPerson {

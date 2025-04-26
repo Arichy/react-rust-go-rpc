@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	person "example.com/go-connect-backend/gen"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -13,7 +11,7 @@ func ProtoPersonBriefToModelPerson(p *person.PersonBrief) *ModelPerson {
 		Id:    p.Id,
 		Name:  p.Name,
 		Email: p.Email,
-		Age:   int(p.Age),
+		Age:   p.Age,
 	}
 }
 
@@ -22,7 +20,7 @@ func ModelPersonToProtoPersonBrief(p *ModelPerson) *person.PersonBrief {
 		Id:    p.Id,
 		Name:  p.Name,
 		Email: p.Email,
-		Age:   int32(p.Age),
+		Age:   p.Age,
 	}
 }
 
@@ -31,10 +29,10 @@ func ModelPersonToProtoPerson(p *ModelPerson) *person.Person {
 		Id:        p.Id,
 		Name:      p.Name,
 		Email:     p.Email,
-		Age:       int32(p.Age),
+		Age:       p.Age,
 		Address:   p.Address,
-		CreatedAt: timestamppb.New(time.Unix(p.CreatedAt, 0).UTC()),
-		UpdatedAt: timestamppb.New(time.Unix(p.UpdatedAt, 0).UTC()),
+		CreatedAt: timestamppb.New(p.CreatedAt),
+		UpdatedAt: timestamppb.New(p.UpdatedAt),
 	}
 }
 
@@ -43,7 +41,7 @@ func createModelPerson(p *person.Person) *ModelPerson {
 		Id:    p.Id,
 		Name:  p.Name,
 		Email: p.Email,
-		Age:   int(p.Age),
+		Age:   p.Age,
 	}
 }
 
@@ -53,7 +51,7 @@ func updateModelPerson(p *person.Person) *ModelPerson {
 		Id:      p.Id,
 		Name:    p.Name,
 		Email:   p.Email,
-		Age:     int(p.Age),
+		Age:     p.Age,
 		Address: p.Address,
 	}
 }

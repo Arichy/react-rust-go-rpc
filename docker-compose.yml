@@ -1,32 +1,41 @@
 services:
+  go-connect-backend:
+    build:
+      context: ./
+      dockerfile: ./go-connect-backend/Dockerfile
+    ports:
+      - '8081:8081'
+    volumes:
+      - ./person.db:/person.db
+    # networks:
+    #   - app-network
+
   # Backend Rust gRPC server
-  # backend:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./backend/Dockerfile
-  #   ports:
-  #     - "50051:50051"
-  #   environment:
-  #     - RUST_LOG=debug
-  #   networks:
-  #     - app-network
+  rust-grpc-backend:
+    build:
+      context: ./
+      dockerfile: ./rust-grpc-backend/Dockerfile
+    ports:
+      - '50051:50051'
+    environment:
+      - DATABASE_URL=sqlite://person.db
+    volumes:
+      - ./person.db:/person.db
+    # networks:
+    #   - app-network
 
   # # Frontend React TypeScript app
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app/frontend
-  #     - /app/frontend/node_modules
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     - VITE_API_URL=http://localhost:50051
-  #   networks:
-  #     - app-network
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./frontend/Dockerfile
+    ports:
+      - '3000:80'
+    depends_on:
+      - go-connect-backend
+      - rust-grpc-backend
+    # networks:
+    #   - app-network
 
   # Envoy proxy for gRPC-Web support
   envoy:
@@ -38,5 +47,16 @@ services:
     # command: ['-c', '/etc/envoy/envoy.yaml']
     # networks:
     # - app-network
+
+  pg:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: person_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 # networks:
 #   app-network:

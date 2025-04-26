@@ -1,7 +1,7 @@
 use crate::{
     person::{Person, PersonBrief},
     repository::ModelPerson,
-    utils::i64_to_ts,
+    utils::{i64_to_ts, offsetdatetime_to_ts},
 };
 
 impl From<ModelPerson> for Person {
@@ -11,8 +11,8 @@ impl From<ModelPerson> for Person {
             name: value.name,
             email: value.email,
             age: value.age as i32,
-            created_at: Some(i64_to_ts(value.created_at)),
-            updated_at: Some(i64_to_ts(value.updated_at)),
+            created_at: Some(offsetdatetime_to_ts(value.created_at)),
+            updated_at: Some(offsetdatetime_to_ts(value.updated_at)),
             address: value.address.unwrap_or_default(),
         }
     }

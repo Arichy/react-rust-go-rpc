@@ -1,0 +1,12 @@
+# frontend
+frontend/node_modules
+frontend/dist
+frontend/.yarn
+
+# go
+go-connect-backend/gen
+go-connect-backend/tmp
+
+# rust
+rust-grpc-backend/target
+rust-grpc-backend/.env

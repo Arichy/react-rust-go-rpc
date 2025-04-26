@@ -5,6 +5,7 @@ use crate::person::{
 };
 
 use async_trait::async_trait;
+use sqlx::types::time::OffsetDateTime;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
@@ -26,12 +27,11 @@ impl PersonRepository for InMemoryRepository {
     async fn create(&self, req: &CreatePersonRequest) -> Result<ModelPerson, RepositoryError> {
         // Generate a UUID if one doesn't exist
 
-        let now = chrono::Utc::now();
-        let ts = now.timestamp();
+        let now = OffsetDateTime::now_utc();
 
         let mut p: ModelPerson = ModelPerson {
-            created_at: ts,
-            updated_at: ts,
+            created_at: now,
+            updated_at: now,
             ..Default::default()
         };
 
@@ -87,7 +87,7 @@ impl PersonRepository for InMemoryRepository {
                 }
 
                 if let Some(age) = req.age.as_ref() {
-                    entry.age = *age as i64;
+                    entry.age = *age;
                 }
 
                 if let Some(address) = req.address.as_ref() {

@@ -11,6 +11,7 @@ import { PersonService } from '@src/services/PersonService';
 import { create } from '@bufbuild/protobuf';
 import { Center, Loader, Modal, Table } from '@mantine/core';
 import { TimestampToDate } from '@src/utils';
+import { notifications } from '@mantine/notifications';
 
 interface PersonModalProps {
   id: string | null;
@@ -50,6 +51,13 @@ function PersonModal({ id, opened, onClose, mode, personService }: PersonModalPr
         queryKey: ['people'],
       });
     },
+    onError: error => {
+      notifications.show({
+        title: 'Create Person Error',
+        message: error.message,
+        color: 'red',
+      });
+    },
   });
 
   const updatePersonMutation = useMutation({
@@ -70,6 +78,13 @@ function PersonModal({ id, opened, onClose, mode, personService }: PersonModalPr
         queryKey: ['people'],
       });
     },
+    onError: error => {
+      notifications.show({
+        title: 'Update Person Error',
+        message: error.message,
+        color: 'red',
+      });
+    },
   });
 
   const renderContent = () => {
@@ -88,30 +103,32 @@ function PersonModal({ id, opened, onClose, mode, personService }: PersonModalPr
     if (mode === 'view') {
       return (
         <Table withTableBorder={false} withRowBorders={false} withColumnBorders={false}>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Td>{data?.person?.name}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Email</Table.Th>
-            <Table.Td>{data?.person?.email}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Age</Table.Th>
-            <Table.Td>{data?.person?.age}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Address</Table.Th>
-            <Table.Td>{data?.person?.address}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Created At</Table.Th>
-            <Table.Td>{data?.person?.createdAt && TimestampToDate(data.person.createdAt).toLocaleString()}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Updated At</Table.Th>
-            <Table.Td>{data?.person?.updatedAt && TimestampToDate(data.person.updatedAt).toLocaleString()}</Table.Td>
-          </Table.Tr>
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Td>{data?.person?.name}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Email</Table.Th>
+              <Table.Td>{data?.person?.email}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Age</Table.Th>
+              <Table.Td>{data?.person?.age}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Address</Table.Th>
+              <Table.Td>{data?.person?.address}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Created At</Table.Th>
+              <Table.Td>{data?.person?.createdAt && TimestampToDate(data.person.createdAt).toLocaleString()}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Updated At</Table.Th>
+              <Table.Td>{data?.person?.updatedAt && TimestampToDate(data.person.updatedAt).toLocaleString()}</Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
         </Table>
       );
     }
@@ -133,7 +150,6 @@ function PersonModal({ id, opened, onClose, mode, personService }: PersonModalPr
         <UpdatePersonForm
           person={data.person}
           onSubmit={p => {
-            console.log(p);
             updatePersonMutation.mutate(p);
             onClose();
           }}

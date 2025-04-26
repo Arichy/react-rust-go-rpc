@@ -68,7 +68,7 @@ func (s *PeopleStorage) Update(req *person.UpdatePersonRequest) (*ModelPerson, e
 		p.Email = *req.Email
 	}
 	if req.Age != nil {
-		p.Age = int(*req.Age)
+		p.Age = *req.Age
 	}
 	if req.Address != nil {
 		p.Address = *req.Address

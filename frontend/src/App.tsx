@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 import './App.css';
 
 import { TransportProvider } from '@connectrpc/connect-query';
@@ -9,6 +10,7 @@ import PersonCRUD from './components/shared/PersonCRUD';
 import { RustPersonService } from './services/RustPersonService';
 import { GoPersonService } from './services/GoPersonService';
 import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 
 const rustPersonService = new RustPersonService();
 const goPersonService = new GoPersonService();
@@ -18,6 +20,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <MantineProvider>
+      <Notifications />
       <QueryClientProvider client={queryClient}>
         <div className="container mx-auto overflow-hidden">
           <h1 className="text-4xl font-bold text-center my-8 px-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

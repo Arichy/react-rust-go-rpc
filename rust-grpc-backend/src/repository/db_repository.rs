@@ -5,35 +5,34 @@ use crate::person::{
     UpdatePersonRequest,
 };
 
-use sqlx::{sqlite::SqliteConnectOptions, QueryBuilder, Row, SqlitePool};
+use sqlx::{types::time::OffsetDateTime, PgPool, QueryBuilder, Row};
 use tonic::async_trait;
 use uuid::Uuid;
 
 use super::{ModelPerson, PersonRepository, RepositoryError};
 
-pub struct SqliteRepository {
-    pool: SqlitePool,
+pub struct DbRepository {
+    pool: PgPool,
 }
 
-impl SqliteRepository {
-    pub fn new(pool: SqlitePool) -> Self {
+impl DbRepository {
+    pub fn new(pool: PgPool) -> Self {
         Self { pool }
     }
 }
 
 #[async_trait]
-impl PersonRepository for SqliteRepository {
+impl PersonRepository for DbRepository {
     async fn create(&self, req: &CreatePersonRequest) -> Result<ModelPerson, RepositoryError> {
         let id = Uuid::new_v4().to_string();
 
-        let now = chrono::Utc::now();
-        let ts = now.timestamp();
+        let now = OffsetDateTime::now_utc();
 
         let inserted = sqlx::query_as!(
             ModelPerson,
             r#"
         INSERT INTO people (id, name, email, age, created_at, updated_at)
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING
             id,
             name,
@@ -47,8 +46,8 @@ impl PersonRepository for SqliteRepository {
             req.name,
             req.email,
             req.age,
-            ts,
-            ts,
+            now,
+            now,
         )
         .fetch_one(&self.pool)
         .await
@@ -61,7 +60,7 @@ impl PersonRepository for SqliteRepository {
         let record = sqlx::query_as!(
             ModelPerson,
             r#"
-SELECT * FROM people WHERE id = ?
+SELECT * FROM people WHERE id = $1
         "#,
             req.id
         )
@@ -74,7 +73,8 @@ SELECT * FROM people WHERE id = ?
 
     async fn update(&self, req: &UpdatePersonRequest) -> Result<ModelPerson, RepositoryError> {
         let now = chrono::Local::now();
-        let ts = now.timestamp();
+        let ts = OffsetDateTime::now_utc();
+        println!("{req:?}");
 
         let mut builder = QueryBuilder::new("UPDATE people SET ");
 
@@ -136,7 +136,7 @@ SELECT * FROM people WHERE id = ?
     async fn delete(&self, req: &DeletePersonRequest) -> Result<(), RepositoryError> {
         let res = sqlx::query!(
             r#"
-delete from people where id = ?
+delete from people where id = $1
         "#,
             req.id
         )
@@ -154,7 +154,7 @@ delete from people where id = ?
         let list = sqlx::query_as!(
             ModelPerson,
             r#"
-        select * from people
+        select * from people ORDER BY created_at
                 "#,
         )
         .fetch_all(&self.pool)
@@ -165,16 +165,12 @@ delete from people where id = ?
     }
 }
 
-pub async fn init_db() -> Result<SqlitePool, RepositoryError> {
+pub async fn init_db() -> Result<PgPool, RepositoryError> {
     let db_url = env::var("DATABASE_URL").unwrap();
 
-    let pool = SqlitePool::connect_with(
-        SqliteConnectOptions::new()
-            .filename(db_url)
-            .create_if_missing(true),
-    )
-    .await
-    .map_err(|err| RepositoryError::DbError(err.to_string()))?;
+    let pool = PgPool::connect(&db_url)
+        .await
+        .map_err(|err| RepositoryError::DbError(err.to_string()))?;
 
     sqlx::query(
         r#"

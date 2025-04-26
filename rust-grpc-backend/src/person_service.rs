@@ -68,8 +68,13 @@ impl<R: PersonRepository> PersonService for PersonServiceImpl<R> {
         let updated_person = self.repository.update(&req).await.map_err(|e| match e {
             RepositoryError::NotFound(_) => Status::not_found("Person not found"),
             RepositoryError::InvalidData(msg) => Status::invalid_argument(msg),
-            _ => Status::internal("Failed to update person"),
+            _ => {
+                println!("{e}");
+                Status::internal("Failed to update person")
+            }
         })?;
+
+        println!("{updated_person:?}");
 
         Ok(Response::new(UpdatePersonResponse {
             person: Some(updated_person.into()),

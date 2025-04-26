@@ -1,5 +1,6 @@
 use chrono::{DateTime, Local, NaiveDateTime, Utc};
 use prost_types::Timestamp;
+use sqlx::types::time::OffsetDateTime;
 
 pub const DATE_TIME_FORMAT: &'static str = "%Y-%m-%dT%H:%M:%S%.6fZ";
 
@@ -28,5 +29,12 @@ pub fn i64_to_ts(ts_int64: i64) -> Timestamp {
     Timestamp {
         seconds: ts_int64,
         nanos: 0,
+    }
+}
+
+pub fn offsetdatetime_to_ts(offset_date_time: OffsetDateTime) -> Timestamp {
+    Timestamp {
+        seconds: offset_date_time.unix_timestamp(),
+        nanos: offset_date_time.unix_timestamp_nanos() as i32,
     }
 }
