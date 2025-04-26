@@ -12,7 +12,6 @@ frontend/src/gen/
 
 # Rust
 rust-grpc-backend/target/
-rust-grpc-backend/Cargo.lock
 
 # Go
 go-connect-backend/tmp/
