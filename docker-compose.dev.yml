@@ -18,5 +18,62 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  go-connect-backend:
+    build:
+      context: ./
+      dockerfile: ./go-connect-backend/Dockerfile.dev
+      tags:
+        - react-rust-go-rpc-go-connect-backend:dev
+    ports:
+      - '8081:8081'
+    volumes:
+      - ./go-connect-backend:/app/go-connect-backend
+      - ./proto:/app/proto
+    environment:
+      - DB_HOST=pg
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=person_db
+    depends_on:
+      - pg
+    image: eact-rust-go-rpc-rust-go-connect-backend:dev
+    stop_grace_period: 200ms
+
+  rust-grpc-backend:
+    build:
+      context: ./
+      dockerfile: ./rust-grpc-backend/Dockerfile.dev
+      tags:
+        - rust-grpc-backend:dev
+    ports:
+      - '50051:50051'
+    volumes:
+      - ./rust-grpc-backend:/app/rust-grpc-backend
+      - ./proto:/app/proto
+    environment:
+      - DATABASE_URL=postgres://user:password@pg:5432/person_db
+    depends_on:
+      - pg
+    image: react-rust-go-rpc-rust-grpc-backend:dev
+    stop_grace_period: 200ms
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./frontend/Dockerfile.dev
+      tags:
+        - frontend:dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app/frontend
+      - ./proto:/app/proto
+    depends_on:
+      - go-connect-backend
+      - rust-grpc-backend
+    image: react-rust-go-rpc-frontend:dev
+    stop_grace_period: 200ms
+
 volumes:
   pg_data:

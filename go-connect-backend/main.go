@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"connectrpc.com/connect"
@@ -230,10 +232,41 @@ func main() {
 	path, handler := personconnect.NewPersonServiceHandler(svc)
 	mux.Handle(path, withCORS(handler))
 
-	log.Println("🚀 Server listening on :8081")
-	err = http.ListenAndServe(":8081", h2c.NewHandler(mux, &http2.Server{}))
+	server := &http.Server{
+		Addr:    ":8081",
+		Handler: h2c.NewHandler(mux, &http2.Server{}),
+	}
 
-	log.Fatalf("listen failed: %v", err)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		log.Println("🚀 Server listening on :8081")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server start failed: %v", err)
+		}
+	}()
+
+	<-quit
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
+	}
+
+	sqlDB, err := db.DB()
+	if err == nil {
+		sqlDB.Close()
+	}
+
+	log.Println("Server gracefully stopped")
+
+	// log.Println("🚀 Server listening on :8081")
+	// err = http.ListenAndServe(":8081", h2c.NewHandler(mux, &http2.Server{}))
+
+	// log.Fatalf("listen failed: %v", err)
 }
 
 func withCORS(h http.Handler) http.Handler {

@@ -1,0 +1,13 @@
+FROM rust:1.85
+
+RUN apt-get update && apt-get install -y \
+  protobuf-compiler \
+  libprotobuf-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/rust-grpc-backend
+RUN cargo install cargo-watch
+
+EXPOSE 50051
+
+CMD ["cargo", "watch", "-x", "run"]

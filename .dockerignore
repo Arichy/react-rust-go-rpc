@@ -2,6 +2,7 @@
 frontend/node_modules
 frontend/dist
 frontend/.yarn
+frontend/src/gen
 
 # go
 go-connect-backend/gen

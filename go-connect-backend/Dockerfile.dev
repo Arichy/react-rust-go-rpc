@@ -1,0 +1,15 @@
+FROM golang:1.24.1-alpine
+
+WORKDIR /app/go-connect-backend
+
+RUN go install github.com/bufbuild/buf/cmd/buf@latest && \
+  go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+  go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest && \
+  go install github.com/air-verse/air@latest
+
+COPY ./go-connect-backend/entrypoint-dev.sh /entrypoint-dev.sh
+RUN chmod +x /entrypoint-dev.sh
+
+EXPOSE 8081
+
+CMD ["/entrypoint-dev.sh"]
