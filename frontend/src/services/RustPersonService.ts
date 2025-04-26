@@ -11,7 +11,7 @@ import {
   UpdatePersonRequest,
   UpdatePersonResponse,
 } from '@src/gen/person_pb';
-import { personClient } from '../components/rust-grpc/grpc';
+import { personClient } from './rust-grpc/grpc';
 
 export class RustPersonService implements PersonServiceType {
   async listPeople(params: ListPeopleRequest): Promise<ListPeopleResponse> {

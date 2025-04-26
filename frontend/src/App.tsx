@@ -3,8 +3,8 @@ import './App.css';
 
 import { TransportProvider } from '@connectrpc/connect-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { transport as rustGrpcTransport } from './components/rust-grpc/grpc';
-import { transport as goConnectTransport } from './components/go-connect/connect';
+import { transport as rustGrpcTransport } from './services/rust-grpc/grpc';
+import { transport as goConnectTransport } from './services/go-connect/connect';
 import PersonCRUD from './components/shared/PersonCRUD';
 import { RustPersonService } from './services/RustPersonService';
 import { GoPersonService } from './services/GoPersonService';
@@ -26,12 +26,12 @@ function App() {
           <div className="flex flex-col xl:flex-row gap-8 px-4 w-full">
             <div className="w-full xl:w-1/2">
               <TransportProvider transport={rustGrpcTransport}>
-                <PersonCRUD title="Person CRUD with Rust gRPC" personService={rustPersonService} />
+                <PersonCRUD title="Person CRUD with Rust gRPC" personService={rustPersonService} serviceName="rust" />
               </TransportProvider>
             </div>
             <div className="w-full xl:w-1/2">
               <TransportProvider transport={goConnectTransport}>
-                <PersonCRUD title="Person CRUD with Go Connect" personService={goPersonService} />
+                <PersonCRUD title="Person CRUD with Go Connect" personService={goPersonService} serviceName="go" />
               </TransportProvider>
             </div>
           </div>

@@ -1,0 +1,7 @@
+node_modules
+dist
+src/gen
+.yarn/cache
+.pnp.*
+.env
+.git

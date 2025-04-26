@@ -1,35 +1,26 @@
-FROM node:18-alpine as build
+FROM node:20-alpine AS builder
+
+RUN corepack enable && corepack prepare yarn@stable --activate
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+COPY ./frontend/package.json ./frontend/yarn.lock ./frontend/
 
-# Copy package.json and lock files
-COPY package.json pnpm-lock.yaml* ./
+COPY ./proto ./proto
 
-# Install dependencies
-RUN pnpm install
+WORKDIR /app/frontend
+RUN yarn install --check-cache
 
-# Copy source code
-COPY . .
-
-# Generate protocol buffer TypeScript files
-RUN mkdir -p src/generated
-RUN apk add --no-cache protobuf
-
-# Build the application
-RUN pnpm build
+COPY ./frontend /app/frontend
+RUN yarn gen-proto && yarn build
 
 # Production stage
 FROM nginx:alpine
 
 # Copy built assets from the build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

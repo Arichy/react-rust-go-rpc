@@ -5,15 +5,16 @@ import PersonList from './PersonList';
 import PersonModal from './PersonModal';
 import { create } from '@bufbuild/protobuf';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Box, Button, Center, Loader, Text, Title } from '@mantine/core';
+import { Box, Button, Center, Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 interface PersonCRUDProps {
   title: string;
   personService: PersonService;
+  serviceName: 'go' | 'rust';
 }
 
-function PersonCRUD({ title, personService }: PersonCRUDProps) {
+function PersonCRUD({ title, personService, serviceName }: PersonCRUDProps) {
   const queryClient = useQueryClient();
 
   const peopleQueryKey = ['people'];
@@ -42,7 +43,7 @@ function PersonCRUD({ title, personService }: PersonCRUDProps) {
     error,
     refetch,
   } = useQuery({
-    queryKey: peopleQueryKey,
+    queryKey: [...peopleQueryKey, serviceName],
     queryFn: async () => {
       const response = await personService.listPeople(create(ListPeopleRequestSchema, { pageSize: 100 }));
       return response.people;

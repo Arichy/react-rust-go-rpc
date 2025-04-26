@@ -11,7 +11,7 @@ import {
   UpdatePersonRequest,
   UpdatePersonResponse,
 } from '@src/gen/person_pb';
-import { personClient } from '../components/go-connect/connect';
+import { personClient } from './go-connect/connect';
 
 export class GoPersonService implements PersonServiceType {
   async listPeople(params: ListPeopleRequest): Promise<ListPeopleResponse> {
