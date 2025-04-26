@@ -180,8 +180,8 @@ pub async fn init_db() -> Result<PgPool, RepositoryError> {
             email TEXT UNIQUE NOT NULL,
             age INTEGER NOT NULL,
             address TEXT,
-            created_at TIMESTAMPTZ NOT NULL,
-            updated_at TIMESTAMPTZ NOT NULL
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )
         "#,
     )

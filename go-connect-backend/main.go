@@ -28,7 +28,7 @@ type PersonService struct {
 type ModelPerson struct {
 	Id        string `gorm:"primaryKey;not null"`
 	Name      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
+	Email     string `gorm:"unique;not null"`
 	Age       int32  `gorm:"not null"`
 	Address   string
 	CreatedAt time.Time `gorm:"autoCreateTime;type:timestamptz;default:now();not null"`
