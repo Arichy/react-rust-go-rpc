@@ -17,6 +17,12 @@ export function CreatePersonForm({
       email: '',
       age: 0,
     },
+    transformValues(values) {
+      return {
+        ...values,
+        age: Number(values.age),
+      };
+    },
     validate: {
       name: (value: string) => (value.length < 2 ? 'Name must be at least 2 characters' : null),
       email: (value: string) => (!/\S+@\S+\.\S+/.test(value) ? 'Invalid email' : null),
@@ -27,6 +33,7 @@ export function CreatePersonForm({
   return (
     <form
       onSubmit={form.onSubmit(values => {
+        console.log(values);
         onSubmit(create(PersonBriefSchema, values));
       })}
     >
@@ -60,6 +67,12 @@ export function UpdatePersonForm({
       email: person.email,
       age: person.age,
       address: person.address,
+    },
+    transformValues(values) {
+      return {
+        ...values,
+        age: Number(values.age),
+      };
     },
     validate: {
       name: (value: string) => (value.length < 2 ? 'Name must be at least 2 characters' : null),
