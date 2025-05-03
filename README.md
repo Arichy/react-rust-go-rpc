@@ -17,26 +17,15 @@ This is a full-stack application with a React TypeScript frontend using Vite, a 
 
 ## Prerequisites
 
-- Node.js
-- Rust and Cargo
-- Go (for the Go backend)
-- Docker (for running Envoy & PostgreSQL)
-- [Protobuf Compiler](https://grpc.io/docs/protoc-installation/) (protoc) - Optional, because @bufbuild/buf is used for generating code in the repo
+- Docker
 
-## Setup Instructions
 
 ```bash
-chmod +x ./setup.sh
-./setup.sh
-```
+# production
+docker-compose up
 
-And then
-
-```bash
+# development
 docker-compose -f docker-compose.dev.yml up
-yarn start:frontend
-yarn start:rust
-yarn start:go
 ```
 
 Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
